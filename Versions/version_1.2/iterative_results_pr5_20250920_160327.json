@@ -1,0 +1,50 @@
+{
+  "timestamp": "20250920_160327",
+  "pr_number": 5,
+  "selected_prompt": "Self-Consistency",
+  "review_score": 7.04,
+  "features": {
+    "num_lines": 69,
+    "num_files": 1,
+    "additions": 62,
+    "deletions": 1,
+    "net_changes": 61,
+    "has_comments": 1,
+    "has_functions": 1,
+    "has_imports": 0,
+    "has_test": 0,
+    "has_docs": 0,
+    "has_config": 0,
+    "is_python": 0,
+    "is_js": 0,
+    "is_java": 0
+  },
+  "heuristics": {
+    "length_chars": 958,
+    "length_words": 126,
+    "bullet_points": 0,
+    "mentions_bug": false,
+    "mentions_suggest": false,
+    "sections_presence": {
+      "summary": false,
+      "bugs": false,
+      "errors": true,
+      "code quality": false,
+      "suggestions": false,
+      "improvements": true,
+      "tests": false,
+      "positive": false,
+      "final review": false
+    }
+  },
+  "meta_evaluation": {
+    "clarity": 9,
+    "usefulness": 9,
+    "depth": 8,
+    "actionability": 8,
+    "positivity": 9,
+    "explain": "Review C is concise and clearly summarizes the key changes and benefits, making it a useful and actionable review."
+  },
+  "training_data_size": 5,
+  "model_trained": true
+}

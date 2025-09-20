@@ -1,0 +1,50 @@
+{
+  "timestamp": "20250920_155242",
+  "pr_number": 1,
+  "selected_prompt": "Few-shot",
+  "review_score": 6.96,
+  "features": {
+    "num_lines": 24,
+    "num_files": 1,
+    "additions": 18,
+    "deletions": 1,
+    "net_changes": 17,
+    "has_comments": 1,
+    "has_functions": 0,
+    "has_imports": 0,
+    "has_test": 0,
+    "has_docs": 1,
+    "has_config": 0,
+    "is_python": 0,
+    "is_js": 0,
+    "is_java": 0
+  },
+  "heuristics": {
+    "length_chars": 596,
+    "length_words": 80,
+    "bullet_points": 6,
+    "mentions_bug": false,
+    "mentions_suggest": true,
+    "sections_presence": {
+      "summary": false,
+      "bugs": false,
+      "errors": false,
+      "code quality": false,
+      "suggestions": false,
+      "improvements": false,
+      "tests": false,
+      "positive": false,
+      "final review": false
+    }
+  },
+  "meta_evaluation": {
+    "clarity": 9,
+    "usefulness": 8,
+    "depth": 7,
+    "actionability": 9,
+    "positivity": 6,
+    "explain": "The review is clear and actionable, providing specific suggestions for improvement, but could be more positive and comprehensive in its feedback."
+  },
+  "training_data_size": 2,
+  "model_trained": false
+}

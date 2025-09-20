@@ -1,0 +1,50 @@
+{
+  "timestamp": "20250920_160425",
+  "pr_number": 4,
+  "selected_prompt": "Meta",
+  "review_score": 8.46,
+  "features": {
+    "num_lines": 53,
+    "num_files": 1,
+    "additions": 46,
+    "deletions": 1,
+    "net_changes": 45,
+    "has_comments": 1,
+    "has_functions": 1,
+    "has_imports": 0,
+    "has_test": 0,
+    "has_docs": 0,
+    "has_config": 0,
+    "is_python": 0,
+    "is_js": 0,
+    "is_java": 0
+  },
+  "heuristics": {
+    "length_chars": 1967,
+    "length_words": 261,
+    "bullet_points": 0,
+    "mentions_bug": true,
+    "mentions_suggest": true,
+    "sections_presence": {
+      "summary": true,
+      "bugs": true,
+      "errors": true,
+      "code quality": true,
+      "suggestions": false,
+      "improvements": true,
+      "tests": true,
+      "positive": true,
+      "final review": false
+    }
+  },
+  "meta_evaluation": {
+    "clarity": 9,
+    "usefulness": 10,
+    "depth": 9,
+    "actionability": 9,
+    "positivity": 7,
+    "explain": "The review is thorough and provides actionable feedback, but also includes some negative comments on missing tests and error handling, balanced with positive notes on the introduction of async implementation and retry mechanism."
+  },
+  "training_data_size": 7,
+  "model_trained": true
+}

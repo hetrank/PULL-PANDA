@@ -1,0 +1,44 @@
+**Summary**: This PR introduces an asynchronous data fetcher using aiohttp with a retry mechanism, replacing the old synchronous implementation.
+
+**Critical Bugs**:
+1. The `fetch_with_retry` function does not handle specific exceptions that may occur during the fetch operation. It should catch and handle exceptions like `aiohttp.ClientError` or `asyncio.TimeoutError` separately. 
+   ```python
+try:
+    return await async_fetch_data(session, url)
+except aiohttp.ClientError as e:
+    # Handle client errors
+except asyncio.TimeoutError as e:
+    # Handle timeouts
+```
+
+**Important Improvements**:
+1. The `fetch_multiple_sources_async` function does not handle the case where `asyncio.gather` returns a mix of results and exceptions. It should be modified to handle this scenario.
+   ```python
+results = await asyncio.gather(*tasks, return_exceptions=True)
+for result in results:
+    if isinstance(result, Exception):
+        # Handle the exception
+    else:
+        # Process the result
+```
+
+**Code Quality & Maintainability**:
+1. The `fetch_with_retry` function uses a magic number for the maximum number of retries. Consider defining a constant for this value.
+   ```python
+MAX_RETRIES = 3
+async def fetch_with_retry(session, url, max_retries=MAX_RETRIES):
+```
+2. The `fetch_data` and `async_fetch_data` functions do not log or handle the case where the response is not JSON. Consider adding error handling for this scenario.
+   ```python
+try:
+    return response.json()
+except ValueError as e:
+    # Handle the error
+```
+
+**Tests & CI**:
+1. There are no tests visible in this diff. Consider adding unit tests to cover the new functionality, especially the retry mechanism and error handling.
+
+**Positive notes**:
+1. The introduction of an asynchronous implementation with aiohttp is a significant improvement over the old synchronous implementation.
+2. The addition of a retry mechanism with exponential backoff is a good practice for handling transient failures.

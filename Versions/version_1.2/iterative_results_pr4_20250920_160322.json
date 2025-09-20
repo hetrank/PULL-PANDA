@@ -1,0 +1,50 @@
+{
+  "timestamp": "20250920_160322",
+  "pr_number": 4,
+  "selected_prompt": "Tree-of-Thought",
+  "review_score": 8.53,
+  "features": {
+    "num_lines": 53,
+    "num_files": 1,
+    "additions": 46,
+    "deletions": 1,
+    "net_changes": 45,
+    "has_comments": 1,
+    "has_functions": 1,
+    "has_imports": 0,
+    "has_test": 0,
+    "has_docs": 0,
+    "has_config": 0,
+    "is_python": 0,
+    "is_js": 0,
+    "is_java": 0
+  },
+  "heuristics": {
+    "length_chars": 3928,
+    "length_words": 597,
+    "bullet_points": 20,
+    "mentions_bug": false,
+    "mentions_suggest": true,
+    "sections_presence": {
+      "summary": false,
+      "bugs": false,
+      "errors": true,
+      "code quality": true,
+      "suggestions": false,
+      "improvements": false,
+      "tests": true,
+      "positive": false,
+      "final review": false
+    }
+  },
+  "meta_evaluation": {
+    "clarity": 9,
+    "usefulness": 10,
+    "depth": 10,
+    "actionability": 9,
+    "positivity": 6,
+    "explain": "The review is thorough and provides actionable feedback, but is somewhat negative in tone, highlighting many areas for improvement."
+  },
+  "training_data_size": 4,
+  "model_trained": false
+}

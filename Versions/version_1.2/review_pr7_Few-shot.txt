@@ -1,0 +1,17 @@
+- Bug: `fetch_from_source` may throw on null key.
+- Suggestion: Add null-check and early return, add unit test.
+
+- Code style: inconsistent naming `get_data` vs `get`.
+- Suggestion: follow project lint rules and rename `get_data` to `get` for consistency.
+
+- Performance: `AdvancedCache` uses `OrderedDict` which can be slow for large caches.
+- Suggestion: consider using a more efficient data structure, such as a `functools.lru_cache` or a dedicated caching library.
+
+- Security: `AdvancedCache` uses `hashlib.md5` which is not cryptographically secure.
+- Suggestion: consider using a more secure hash function, such as `hashlib.sha256`.
+
+- Code organization: `AdvancedCache` has a mix of cache management and decoration logic.
+- Suggestion: consider splitting the cache management and decoration logic into separate classes or modules for better modularity and reusability.
+
+- Test coverage: no tests are provided for `AdvancedCache`.
+- Suggestion: add unit tests and integration tests to ensure the cache is working correctly and efficiently.

@@ -1,0 +1,50 @@
+{
+  "timestamp": "20250920_155237",
+  "pr_number": 2,
+  "selected_prompt": "Zero-shot",
+  "review_score": 7.67,
+  "features": {
+    "num_lines": 237,
+    "num_files": 7,
+    "additions": 194,
+    "deletions": 7,
+    "net_changes": 187,
+    "has_comments": 1,
+    "has_functions": 1,
+    "has_imports": 0,
+    "has_test": 0,
+    "has_docs": 1,
+    "has_config": 0,
+    "is_python": 0,
+    "is_js": 0,
+    "is_java": 0
+  },
+  "heuristics": {
+    "length_chars": 3002,
+    "length_words": 455,
+    "bullet_points": 23,
+    "mentions_bug": true,
+    "mentions_suggest": true,
+    "sections_presence": {
+      "summary": false,
+      "bugs": true,
+      "errors": false,
+      "code quality": false,
+      "suggestions": true,
+      "improvements": false,
+      "tests": true,
+      "positive": false,
+      "final review": false
+    }
+  },
+  "meta_evaluation": {
+    "clarity": 9,
+    "usefulness": 8,
+    "depth": 8,
+    "actionability": 7,
+    "positivity": 6,
+    "explain": "The review is thorough and provides specific feedback on code quality, security, and best practices, but could be more concise and focused on actionable suggestions."
+  },
+  "training_data_size": 1,
+  "model_trained": false
+}

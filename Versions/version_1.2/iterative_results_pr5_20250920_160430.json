@@ -1,0 +1,50 @@
+{
+  "timestamp": "20250920_160430",
+  "pr_number": 5,
+  "selected_prompt": "Chain-of-Thought",
+  "review_score": 7.69,
+  "features": {
+    "num_lines": 69,
+    "num_files": 1,
+    "additions": 62,
+    "deletions": 1,
+    "net_changes": 61,
+    "has_comments": 1,
+    "has_functions": 1,
+    "has_imports": 0,
+    "has_test": 0,
+    "has_docs": 0,
+    "has_config": 0,
+    "is_python": 0,
+    "is_js": 0,
+    "is_java": 0
+  },
+  "heuristics": {
+    "length_chars": 3135,
+    "length_words": 443,
+    "bullet_points": 0,
+    "mentions_bug": true,
+    "mentions_suggest": true,
+    "sections_presence": {
+      "summary": false,
+      "bugs": true,
+      "errors": true,
+      "code quality": false,
+      "suggestions": false,
+      "improvements": false,
+      "tests": false,
+      "positive": false,
+      "final review": true
+    }
+  },
+  "meta_evaluation": {
+    "clarity": 9,
+    "usefulness": 10,
+    "depth": 9,
+    "actionability": 8,
+    "positivity": 7,
+    "explain": "The review is thorough and provides actionable feedback, but could be more concise and focus on the most critical issues, with a slightly more positive tone to encourage improvement."
+  },
+  "training_data_size": 8,
+  "model_trained": true
+}
