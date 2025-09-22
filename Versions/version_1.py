@@ -5,29 +5,23 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 from langchain_groq import ChatGroq
 
-# ------------------------------
 # 1. Load API Keys
-# ------------------------------
 load_dotenv()
 
 # GitHub Personal Access Token
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN") or "ghp_xxxxxxx"   # fallback hardcode (replace if needed)
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 # Groq API Key
 GROQ_API_KEY = os.getenv("API_KEY")
 if not GROQ_API_KEY:
     raise ValueError("❌ GROQ_API_KEY not found. Please set it in .env file.")
 
-# ------------------------------
 # 2. GitHub PR Config
-# ------------------------------
-owner = "prince-chovatiya01"
-repo = "nutrition-diet-planner"
-pr_number = 2
+owner = os.getenv("OWNER")
+repo = os.getenv("REPO")
+pr_number = os.getenv("PR_NUMBER")
 
-# ------------------------------
 # 3. Fetch PR Diff from GitHub
-# ------------------------------
 def fetch_pr_diff(owner, repo, pr_number, token):
     url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}"
     headers = {"Authorization": f"token {token}"}
@@ -41,9 +35,7 @@ def fetch_pr_diff(owner, repo, pr_number, token):
     diff = requests.get(diff_url, headers=headers).text
     return diff
 
-# ------------------------------
 # 4. Post Review Comment to GitHub
-# ------------------------------
 def post_review_comment(owner, repo, pr_number, token, review_body):
     url = f"https://api.github.com/repos/{owner}/{repo}/issues/{pr_number}/comments"
     headers = {
@@ -59,9 +51,7 @@ def post_review_comment(owner, repo, pr_number, token, review_body):
 
     return response.json()
 
-# ------------------------------
 # 5. Initialize Groq AI Reviewer
-# ------------------------------
 llm = ChatGroq(
     model="llama-3.3-70b-versatile",
     temperature=0.3,
@@ -78,9 +68,7 @@ review_prompt = ChatPromptTemplate.from_messages([
 
 review_chain = review_prompt | llm | parser
 
-# ------------------------------
 # 6. Main Logic
-# ------------------------------
 if __name__ == "__main__":
     try:
         # Fetch PR diff
