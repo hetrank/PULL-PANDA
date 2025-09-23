@@ -1,4 +1,4 @@
-# 🤖 GitHub PR Review Agent
+# 🤖 PULL-PANDA: GitHub PR Review Agent
 
 An AI-powered agent that reviews GitHub Pull Requests (PRs) and provides meaningful feedback on code changes, descriptions, and best practices.
 
