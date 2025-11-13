@@ -10,7 +10,7 @@ Note: posting can fail due to permissions; prompt_tester gracefully handles this
 """
 
 import requests
-from langchain.schema.output_parser import StrOutputParser
+from langchain_core.output_parsers import StrOutputParser
 from langchain_groq import ChatGroq
 from config import GITHUB_TOKEN, OWNER, REPO, PR_NUMBER, GROQ_API_KEY
 

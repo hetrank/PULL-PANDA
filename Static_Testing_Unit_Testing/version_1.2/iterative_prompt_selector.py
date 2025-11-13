@@ -101,9 +101,16 @@ class IterativePromptSelector:
 
     def select_best_prompt(self, features_vector):
         """Select the best prompt based on current model prediction."""
+        
+        # FIX: Check for empty/malformed features_vector before proceeding
+        # The 'or not features_vector.size' check ensures the array is not empty.
         if (not self.is_trained or
-                len(self.feature_history) < self.min_samples_for_training):
-            # Not enough data yet, use round-robin selection
+            len(self.feature_history) < self.min_samples_for_training or
+            not features_vector.size):  # <-- ADDED CHECK
+            
+            # Not enough data yet OR invalid input vector, use round-robin selection
+            # Note: If prompt_names is also empty, this will raise an IndexError,
+            # but we assume prompt_names is always populated.
             return self.prompt_names[
                 len(self.feature_history) % len(self.prompt_names)
             ]

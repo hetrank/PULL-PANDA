@@ -1,127 +1,119 @@
 """
 Test suite for update_model method.
-Tests model training and retraining logic.
+Tests training logic, data accumulation, and error handling.
 """
 
 import pytest
+import unittest
 import numpy as np
-from unittest.mock import Mock, patch
+from unittest.mock import patch, MagicMock
 from iterative_prompt_selector import IterativePromptSelector
 
 
-class TestUpdateModel:
-    """Test suite for model updating."""
+class TestUpdateModel(unittest.TestCase):
+    """Tests for update_model method"""
 
-    @pytest.fixture
-    def selector(self):
-        """Create selector instance for testing."""
-        return IterativePromptSelector()
+    def setUp(self):
+        with patch("iterative_prompt_selector.get_prompts") as mock_prompts:
+            mock_prompts.return_value = {"p1": MagicMock(), "p2": MagicMock()}
+            self.selector = IterativePromptSelector()
 
-    def test_update_model_first_sample(self, selector):
-        """Test adding first training sample."""
-        features_vector = np.array([100, 5, 50, 20, 30, 1, 1, 1, 0, 0, 0, 1, 0, 0])
-        prompt_name = selector.prompt_names[0]
-        score = 7.5
-        
-        selector.update_model(features_vector, prompt_name, score)
-        
-        assert len(selector.feature_history) == 1
-        assert len(selector.prompt_history) == 1
-        assert len(selector.score_history) == 1
-        assert selector.score_history[0] == 7.5
-        assert selector.is_trained == False  # Not enough samples yet
+    def test_update_model_appends_history(self):
+        """Test that update_model correctly appends to history lists"""
 
-    def test_update_model_reaches_min_samples(self, selector):
-        """Test model training when reaching minimum samples."""
-        features_vector = np.array([100, 5, 50, 20, 30, 1, 1, 1, 0, 0, 0, 1, 0, 0])
-        
-        # Add minimum samples
-        for i in range(selector.min_samples_for_training):
-            selector.update_model(
-                features_vector * (i + 1),
-                selector.prompt_names[i % len(selector.prompt_names)],
-                7.0 + i * 0.5
-            )
-        
-        assert len(selector.feature_history) == selector.min_samples_for_training
-        assert selector.is_trained == True
+        features = np.array([1.0, 2.0])
+        score = 8.5
+        prompt = "p1"
 
-    def test_update_model_retraining(self, selector):
-        """Test model retraining with additional samples."""
-        features_vector = np.array([50, 2, 10, 5, 5, 0, 1, 1, 0, 0, 0, 1, 0, 0])
-        
-        # Initial training
-        for i in range(6):
-            selector.update_model(
-                features_vector * (i + 1),
-                selector.prompt_names[i % len(selector.prompt_names)],
-                6.0 + i
-            )
-        
-        initial_count = len(selector.feature_history)
-        
-        # Add more samples
-        selector.update_model(features_vector * 10, selector.prompt_names[0], 9.5)
-        
-        assert len(selector.feature_history) == initial_count + 1
-        assert selector.is_trained == True
+        self.selector.update_model(features, prompt, score)
 
-    def test_update_model_training_failure_value_error(self, selector):
-        """Test handling of ValueError during training."""
-        features_vector = np.array([100, 5, 50, 20, 30, 1, 1, 1, 0, 0, 0, 1, 0, 0])
-        
-        # Add samples to reach min_samples
-        for i in range(selector.min_samples_for_training - 1):
-            selector.update_model(
-                features_vector,
-                selector.prompt_names[0],
-                7.0
-            )
-        
-        # Mock model.fit to raise ValueError
-        with patch.object(selector.model, 'fit', side_effect=ValueError("Invalid data")):
-            selector.update_model(features_vector, selector.prompt_names[0], 8.0)
-            
-            # Should have data stored but is_trained should be False
-            assert len(selector.feature_history) == selector.min_samples_for_training
-            assert selector.is_trained == False
+        self.assertEqual(len(self.selector.feature_history), 1)
+        self.assertTrue(np.array_equal(self.selector.feature_history[0], features))
 
-    def test_update_model_training_failure_runtime_error(self, selector):
-        """Test handling of RuntimeError during training."""
-        features_vector = np.array([50, 2, 10, 5, 5, 0, 1, 1, 0, 0, 0, 1, 0, 0])
-        
-        for i in range(selector.min_samples_for_training - 1):
-            selector.update_model(
-                features_vector,
-                selector.prompt_names[0],
-                6.5
-            )
-        
-        with patch.object(selector.model, 'fit', side_effect=RuntimeError("Training failed")):
-            selector.update_model(features_vector, selector.prompt_names[0], 7.0)
-            
-            assert selector.is_trained == False
+        self.assertEqual(self.selector.prompt_history, [0])  # p1 index
+        self.assertEqual(self.selector.score_history, [8.5])
 
-    def test_update_model_prompt_index_mapping(self, selector):
-        """Test correct mapping of prompt names to indices."""
-        features_vector = np.array([100, 5, 50, 20, 30, 1, 1, 1, 0, 0, 0, 1, 0, 0])
-        
-        # Update with third prompt
-        prompt_name = selector.prompt_names[2]
-        selector.update_model(features_vector, prompt_name, 8.0)
-        
-        assert selector.prompt_history[0] == 2
+    @patch("iterative_prompt_selector.RandomForestRegressor.fit")
+    @patch("iterative_prompt_selector.StandardScaler.transform")
+    @patch("iterative_prompt_selector.StandardScaler.fit")
+    def test_update_model_trains_at_threshold(
+        self, mock_scaler_fit, mock_scaler_transform, mock_model_fit
+    ):
+        """Test model starts training exactly when min_samples_for_training is met"""
 
-    def test_update_model_score_accumulation(self, selector):
-        """Test that scores are accumulated correctly."""
-        features_vector = np.array([50, 2, 10, 5, 5, 0, 1, 1, 0, 0, 0, 1, 0, 0])
-        scores = [5.0, 6.5, 7.0, 8.5, 9.0, 7.5]
-        
-        for i, score in enumerate(scores):
-            selector.update_model(
-                features_vector,
-                selector.prompt_names[i % len(selector.prompt_names)],
-                score
-            )
-        
-        assert selector.score_history == scores
+        # Add samples below threshold
+        for _ in range(self.selector.min_samples_for_training - 1):
+            self.selector.update_model(np.array([1, 2]), "p1", 5.0)
+
+        # Pre-training checks
+        self.assertFalse(self.selector.is_trained)
+        mock_scaler_fit.assert_not_called()
+        mock_model_fit.assert_not_called()
+
+        # Add the final sample to reach training point
+        self.selector.update_model(np.array([1, 2]), "p1", 6.0)
+
+        # Scaler should fit ONCE at first training
+        mock_scaler_fit.assert_called_once()
+        mock_scaler_transform.assert_called()
+        mock_model_fit.assert_called()
+
+        self.assertTrue(self.selector.is_trained)
+
+    @patch("iterative_prompt_selector.RandomForestRegressor.fit")
+    @patch("iterative_prompt_selector.StandardScaler.transform")
+    @patch("iterative_prompt_selector.StandardScaler.fit")
+    def test_update_model_retrain_after_threshold(
+        self, mock_scaler_fit, mock_scaler_transform, mock_model_fit
+    ):
+        """Test that retraining occurs on additional samples but scaler.fit() does not repeat"""
+
+        # Fill exactly threshold samples
+        for _ in range(self.selector.min_samples_for_training):
+            self.selector.update_model(np.array([0.5, 1.5]), "p1", 7.0)
+
+        # First training happened — now add extra sample
+        mock_scaler_fit.reset_mock()
+        mock_model_fit.reset_mock()
+
+        self.selector.update_model(np.array([2.0, 3.0]), "p2", 9.0)
+
+        # scaler.fit() should NOT run again
+        mock_scaler_fit.assert_not_called()
+
+        # But scaler.transform + model.fit SHOULD run
+        mock_scaler_transform.assert_called()
+        mock_model_fit.assert_called()
+
+    @patch("iterative_prompt_selector.RandomForestRegressor.fit", side_effect=ValueError("bad data"))
+    @patch("iterative_prompt_selector.StandardScaler.transform")
+    @patch("iterative_prompt_selector.StandardScaler.fit")
+    def test_update_model_training_failure_sets_untrained(
+        self, mock_scaler_fit, mock_scaler_transform, mock_model_fit
+    ):
+        """Test that training errors reset is_trained to False"""
+
+        # Fill enough samples to trigger training
+        for _ in range(self.selector.min_samples_for_training - 1):
+            self.selector.update_model(np.array([1, 1]), "p1", 5.0)
+
+        # Next update triggers training failure
+        self.selector.update_model(np.array([2, 2]), "p1", 5.0)
+
+        self.assertFalse(self.selector.is_trained)
+
+    @patch("iterative_prompt_selector.StandardScaler.transform", side_effect=RuntimeError("transform fail"))
+    @patch("iterative_prompt_selector.StandardScaler.fit")
+    def test_update_model_transform_failure(
+        self, mock_scaler_fit, mock_scaler_transform
+    ):
+        """Test scaler.transform errors also reset training state"""
+
+        # Fill enough to train
+        for _ in range(self.selector.min_samples_for_training - 1):
+            self.selector.update_model(np.array([0, 0]), "p1", 4.0)
+
+        # Trigger training
+        self.selector.update_model(np.array([1, 1]), "p1", 4.0)
+
+        self.assertFalse(self.selector.is_trained)

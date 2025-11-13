@@ -1,0 +1,51 @@
+{
+  "timestamp": "20251113_132430",
+  "pr_number": 7,
+  "selected_prompt": "Meta",
+  "review_score": 8.12,
+  "features": {
+    "num_lines": 27,
+    "num_files": 1,
+    "additions": 11,
+    "deletions": 2,
+    "net_changes": 9,
+    "has_comments": 0,
+    "has_functions": 1,
+    "has_imports": 0,
+    "has_test": 0,
+    "has_docs": 0,
+    "has_config": 0,
+    "is_python": 0,
+    "is_js": 0,
+    "is_java": 0
+  },
+  "heuristics": {
+    "length_chars": 1990,
+    "length_words": 282,
+    "bullet_points": 5,
+    "mentions_bug": true,
+    "mentions_suggest": true,
+    "sections_presence": {
+      "summary": true,
+      "bugs": true,
+      "errors": false,
+      "code quality": true,
+      "suggestions": false,
+      "improvements": true,
+      "tests": true,
+      "positive": true,
+      "final review": false
+    }
+  },
+  "meta_evaluation": {
+    "clarity": 8,
+    "usefulness": 9,
+    "depth": 9,
+    "actionability": 8,
+    "positivity": 6,
+    "explain": "The review is thorough and provides actionable feedback, but could be improved by focusing on the most critical issues and providing more concise explanations."
+  },
+  "training_samples": 4,
+  "static_output": "=== \ud83d\udd0d Targeted Static Analysis for PYTHON (1 files changed) ===\n\n| \ud83e\udde9 Pylint:\n```\n************* Module Weatherly/backend/weather_service.py\nWeatherly/backend/weather_service.py:1:0: F0001: No module named Weatherly/backend/weather_service.py (fatal)\n```\n\n| \ud83c\udfaf Flake8:\n```\nWeatherly/backend/weather_service.py:0:1: E902 FileNotFoundError: [Errno 2] No such file or directory: 'Weatherly/backend/weather_service.py'\n```\n\n| \ud83d\udd12 Bandit:\n```\nRun started:2025-11-13 07:54:26.985508\n\nTest results:\n\tNo issues identified.\n\nCode scanned:\n\tTotal lines of code: 0\n\tTotal lines skipped (#nosec): 0\n\tTotal potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0\n\nRun metrics:\n\tTotal issues (by severity):\n\t\tUndefined: 0\n\t\tLow: 0\n\t\tMedium: 0\n\t\tHigh: 0\n\tTotal issues (by confidence):\n\t\tUndefined: 0\n\t\tLow: 0\n\t\tMedium: 0\n\t\tHigh: 0\nFiles skipped (1):\n\t.\\Weatherly/backend/weather_service.py (No such file or directory)\n```\n\n| \ud83e\udde0 Mypy:\n```\nmypy: can't read file 'Weatherly\\backend\\weather_service.py': No such file or directory\n```",
+  "retrieved_context": "# Our Engineering Coding Standards\n\n## Python\n- All functions must have type hints.\n- Use `black` for formatting.\n- All public functions must have a docstring explaining args, returns, and raises.\n- Avoid global variables. Pass state explicitly.\n\n## General\n- PRs should be small and focused.\n- Always include unit tests for new logic.\n- Do not commit secrets. Use .env files.\n---\n# Our Engineering Coding Standards\n\n## Python\n- All functions must have type hints.\n- Use `black` for formatting.\n- All public functions must have a docstring explaining args, returns, and raises.\n- Avoid global variables. Pass state explicitly.\n\n## General\n- PRs should be small and focused.\n- Always include unit tests for new logic.\n- Do not commit secrets. Use .env files.\n---\n# Our Engineering Coding Standards\n\n## Python\n- All functions must have type hints.\n- Use `black` for formatting.\n- All public functions must have a docstring explaining args, returns, and raises.\n- Avoid global variables. Pass state explicitly.\n\n## General\n- PRs should be small and focused.\n- Always include unit tests for new logic.\n- Do not commit secrets. Use .env files.\n---\n# Our Engineering Coding Standards\n\n## Python\n- All functions must have type hints.\n- Use `black` for formatting.\n- All public functions must have a docstring explaining args, returns, and raises.\n- Avoid global variables. Pass state explicitly.\n\n## General\n- PRs should be small and focused.\n- Always include unit tests for new logic.\n- Do not commit secrets. Use .env files."
+}

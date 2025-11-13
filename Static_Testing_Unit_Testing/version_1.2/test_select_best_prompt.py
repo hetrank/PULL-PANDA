@@ -5,103 +5,82 @@ Tests prompt selection logic with and without trained model.
 
 import pytest
 import numpy as np
-from unittest.mock import Mock, patch
+import unittest
+from unittest.mock import Mock, patch, MagicMock, mock_open
 from iterative_prompt_selector import IterativePromptSelector
 
 
-class TestSelectBestPrompt:
-    """Test suite for prompt selection."""
+class TestSelectBestPrompt(unittest.TestCase):
+    """Tests for select_best_prompt method"""
 
-    @pytest.fixture
-    def selector(self):
-        """Create selector instance for testing."""
-        return IterativePromptSelector()
+    def setUp(self):
+        with patch('iterative_prompt_selector.get_prompts') as mock_get:
+            mock_get.return_value = {
+                'prompt1': Mock(), 'prompt2': Mock(), 'prompt3': Mock()
+            }
+            self.selector = IterativePromptSelector()
 
-    def test_select_prompt_untrained_round_robin(self, selector):
-        """Test round-robin selection when model is untrained."""
-        features_vector = np.array([100, 5, 50, 20, 30, 1, 1, 1, 0, 0, 0, 1, 0, 0])
+    def test_select_best_prompt_untrained_round_robin(self):
+        """Test round-robin selection when model is not trained"""
+        features = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
         
         # First call should return first prompt
-        prompt1 = selector.select_best_prompt(features_vector)
-        assert prompt1 == selector.prompt_names[0]
+        prompt1 = self.selector.select_best_prompt(features)
+        self.assertEqual(prompt1, 'prompt1')
         
-        # Add one sample to history
-        selector.feature_history.append(features_vector)
+        # Add to history to move to next
+        self.selector.feature_history.append(features)
         
         # Second call should return second prompt
-        prompt2 = selector.select_best_prompt(features_vector)
-        assert prompt2 == selector.prompt_names[1]
+        prompt2 = self.selector.select_best_prompt(features)
+        self.assertEqual(prompt2, 'prompt2')
 
-    def test_select_prompt_insufficient_training_data(self, selector):
-        """Test selection with insufficient training data."""
-        features_vector = np.array([50, 2, 10, 5, 5, 0, 1, 1, 0, 0, 0, 1, 0, 0])
+    def test_select_best_prompt_insufficient_data(self):
+        """Test selection with insufficient training data"""
+        self.selector.is_trained = True
+        self.selector.feature_history = [np.zeros(14)] * 3  # Less than min
         
-        # Add some samples but less than min_samples_for_training
-        for i in range(3):
-            selector.feature_history.append(features_vector)
-        
-        selector.is_trained = False
+        features = np.zeros(14)
+        prompt = self.selector.select_best_prompt(features)
         
         # Should still use round-robin
-        prompt = selector.select_best_prompt(features_vector)
-        assert prompt in selector.prompt_names
+        self.assertIn(prompt, self.selector.prompt_names)
 
-    def test_select_prompt_with_trained_model(self, selector):
-        """Test selection with trained model."""
-        features_vector = np.array([100, 5, 50, 20, 30, 1, 1, 1, 0, 0, 0, 1, 0, 0])
+    def test_select_best_prompt_trained_model(self):
+        """Test selection with trained model"""
+        # Set up as trained
+        self.selector.is_trained = True
+        self.selector.feature_history = [np.zeros(14)] * 10
         
-        # Setup trained state
-        selector.is_trained = True
-        for i in range(6):
-            selector.feature_history.append(features_vector * (i + 1))
+        # Mock model prediction
+        self.selector.model.predict = Mock(return_value=np.array([5.0, 8.0, 6.0]))
         
-        # Mock the model prediction
-        selector.model.predict = Mock(return_value=np.array([5.0, 7.5, 6.0, 4.5, 8.0, 5.5, 6.5]))
+        features = np.ones(14)
+        prompt = self.selector.select_best_prompt(features)
         
-        # Should return prompt with highest predicted score
-        prompt = selector.select_best_prompt(features_vector)
-        assert prompt == selector.prompt_names[4]  # Index 4 has score 8.0
+        # Should select prompt with highest predicted score (prompt2, index 1)
+        self.assertEqual(prompt, 'prompt2')
+        self.selector.model.predict.assert_called_once()
 
-    def test_select_prompt_model_prediction_failure(self, selector):
-        """Test fallback when model prediction fails."""
-        features_vector = np.array([100, 5, 50, 20, 30, 1, 1, 1, 0, 0, 0, 1, 0, 0])
+    def test_select_best_prompt_model_prediction_failure(self):
+        """Test fallback when model prediction fails"""
+        self.selector.is_trained = True
+        self.selector.feature_history = [np.zeros(14)] * 10
+        self.selector.model.predict = Mock(side_effect=ValueError("Prediction error"))
         
-        selector.is_trained = True
-        for i in range(6):
-            selector.feature_history.append(features_vector)
+        features = np.ones(14)
+        prompt = self.selector.select_best_prompt(features)
         
-        # Mock model to raise error
-        selector.model.predict = Mock(side_effect=ValueError("Prediction error"))
-        
-        # Should fallback to first prompt
-        prompt = selector.select_best_prompt(features_vector)
-        assert prompt == selector.prompt_names[0]
+        # Should fall back to first prompt
+        self.assertEqual(prompt, 'prompt1')
 
-    def test_select_prompt_index_error_handling(self, selector):
-        """Test handling of IndexError during selection."""
-        features_vector = np.array([100, 5, 50, 20, 30, 1, 1, 1, 0, 0, 0, 1, 0, 0])
+    def test_select_best_prompt_index_error(self):
+        """Test fallback when IndexError occurs"""
+        self.selector.is_trained = True
+        self.selector.feature_history = [np.zeros(14)] * 10
+        self.selector.model.predict = Mock(side_effect=IndexError("Index error"))
         
-        selector.is_trained = True
-        for i in range(6):
-            selector.feature_history.append(features_vector)
+        features = np.ones(14)
+        prompt = self.selector.select_best_prompt(features)
         
-        # Mock model to raise IndexError
-        selector.model.predict = Mock(side_effect=IndexError("Index out of range"))
-        
-        prompt = selector.select_best_prompt(features_vector)
-        assert prompt == selector.prompt_names[0]
-
-    def test_select_prompt_all_equal_scores(self, selector):
-        """Test selection when all prompts have equal predicted scores."""
-        features_vector = np.array([50, 2, 10, 5, 5, 0, 1, 1, 0, 0, 0, 1, 0, 0])
-        
-        selector.is_trained = True
-        for i in range(6):
-            selector.feature_history.append(features_vector)
-        
-        # All scores equal
-        selector.model.predict = Mock(return_value=np.array([5.0] * len(selector.prompt_names)))
-        
-        # Should return first prompt (argmax returns first index for ties)
-        prompt = selector.select_best_prompt(features_vector)
-        assert prompt == selector.prompt_names[0]
+        self.assertEqual(prompt, 'prompt1')

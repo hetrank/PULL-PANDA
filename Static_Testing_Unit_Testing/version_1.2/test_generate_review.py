@@ -5,123 +5,90 @@ Tests model training and retraining logic.
 
 import pytest
 import numpy as np
-from unittest.mock import Mock, patch
+import unittest
+from unittest.mock import Mock, patch, MagicMock, mock_open
 from iterative_prompt_selector import IterativePromptSelector
 
 
-class TestUpdateModel:
-    """Test suite for model updating."""
+class TestGenerateReview(unittest.TestCase):
+    """Tests for generate_review method"""
 
-    @pytest.fixture
-    def selector(self):
-        """Create selector instance for testing."""
-        return IterativePromptSelector()
+    def setUp(self):
+        with patch('iterative_prompt_selector.get_prompts'):
+            self.selector = IterativePromptSelector()
 
-    def test_update_model_first_sample(self, selector):
-        """Test adding first training sample."""
-        features_vector = np.array([100, 5, 50, 20, 30, 1, 1, 1, 0, 0, 0, 1, 0, 0])
-        prompt_name = selector.prompt_names[0]
-        score = 7.5
+    @patch('iterative_prompt_selector.llm')
+    @patch('iterative_prompt_selector.parser')
+    @patch('iterative_prompt_selector.time') # Add time mock to avoid real time in success test
+    def test_generate_review_success(self, mock_time, mock_parser, mock_llm):
+        """Test successful review generation"""
         
-        selector.update_model(features_vector, prompt_name, score)
+        # 1. Mock the *final* chain object (the result of A|B|C)
+        final_chain_mock = MagicMock()
+        final_chain_mock.invoke.return_value = "This is a great review!"
         
-        assert len(selector.feature_history) == 1
-        assert len(selector.prompt_history) == 1
-        assert len(selector.score_history) == 1
-        assert selector.score_history[0] == 7.5
-        assert selector.is_trained == False  # Not enough samples yet
-
-    def test_update_model_reaches_min_samples(self, selector):
-        """Test model training when reaching minimum samples."""
-        features_vector = np.array([100, 5, 50, 20, 30, 1, 1, 1, 0, 0, 0, 1, 0, 0])
-        
-        # Add minimum samples
-        for i in range(selector.min_samples_for_training):
-            selector.update_model(
-                features_vector * (i + 1),
-                selector.prompt_names[i % len(selector.prompt_names)],
-                7.0 + i * 0.5
-            )
-        
-        assert len(selector.feature_history) == selector.min_samples_for_training
-        assert selector.is_trained == True
-
-    def test_update_model_retraining(self, selector):
-        """Test model retraining with additional samples."""
-        features_vector = np.array([50, 2, 10, 5, 5, 0, 1, 1, 0, 0, 0, 1, 0, 0])
-        
-        # Initial training
-        for i in range(6):
-            selector.update_model(
-                features_vector * (i + 1),
-                selector.prompt_names[i % len(selector.prompt_names)],
-                6.0 + i
-            )
-        
-        initial_count = len(selector.feature_history)
-        
-        # Add more samples
-        selector.update_model(features_vector * 10, selector.prompt_names[0], 9.5)
-        
-        assert len(selector.feature_history) == initial_count + 1
-        assert selector.is_trained == True
-
-    def test_update_model_training_failure_value_error(self, selector):
-        """Test handling of ValueError during training."""
-        features_vector = np.array([100, 5, 50, 20, 30, 1, 1, 1, 0, 0, 0, 1, 0, 0])
-        
-        # Add samples to reach min_samples
-        for i in range(selector.min_samples_for_training - 1):
-            selector.update_model(
-                features_vector,
-                selector.prompt_names[0],
-                7.0
-            )
-        
-        # Mock model.fit to raise ValueError
-        with patch.object(selector.model, 'fit', side_effect=ValueError("Invalid data")):
-            selector.update_model(features_vector, selector.prompt_names[0], 8.0)
+        # 2. Mock the chain *construction* to return the final_chain_mock
+        # Use patch.object to mock the pipe operator on the final component (parser)
+        # The actual line is `chain = self.prompts[selected_prompt] | llm | parser`
+        # We mock the result of the last pipe operation involving `parser`.
+        with patch.object(mock_parser, '__ror__', return_value=final_chain_mock):
             
-            # Should have data stored but is_trained should be False
-            assert len(selector.feature_history) == selector.min_samples_for_training
-            assert selector.is_trained == False
-
-    def test_update_model_training_failure_runtime_error(self, selector):
-        """Test handling of RuntimeError during training."""
-        features_vector = np.array([50, 2, 10, 5, 5, 0, 1, 1, 0, 0, 0, 1, 0, 0])
-        
-        for i in range(selector.min_samples_for_training - 1):
-            selector.update_model(
-                features_vector,
-                selector.prompt_names[0],
-                6.5
-            )
-        
-        with patch.object(selector.model, 'fit', side_effect=RuntimeError("Training failed")):
-            selector.update_model(features_vector, selector.prompt_names[0], 7.0)
+            # Mock time so elapsed can be checked easily
+            mock_time.time.side_effect = [1.0, 1.5] # Start time 1.0, End time 1.5
             
-            assert selector.is_trained == False
+            diff_text = "diff content here"
+            review, elapsed = self.selector.generate_review(diff_text, 'test_prompt')
+            
+            self.assertEqual(review, "This is a great review!")
+            # The elapsed time should be 1.5 - 1.0 = 0.5
+            self.assertAlmostEqual(elapsed, 0.5)
 
-    def test_update_model_prompt_index_mapping(self, selector):
-        """Test correct mapping of prompt names to indices."""
-        features_vector = np.array([100, 5, 50, 20, 30, 1, 1, 1, 0, 0, 0, 1, 0, 0])
+    @patch('iterative_prompt_selector.llm')
+    @patch('iterative_prompt_selector.parser')
+    def test_generate_review_truncates_diff(self, mock_parser, mock_llm):
+        """Test that long diffs are truncated to 4000 chars"""
         
-        # Update with third prompt
-        prompt_name = selector.prompt_names[2]
-        selector.update_model(features_vector, prompt_name, 8.0)
-        
-        assert selector.prompt_history[0] == 2
+        # Mock the *final* chain object
+        final_chain_mock = MagicMock()
+        final_chain_mock.invoke.return_value = "Review"
 
-    def test_update_model_score_accumulation(self, selector):
-        """Test that scores are accumulated correctly."""
-        features_vector = np.array([50, 2, 10, 5, 5, 0, 1, 1, 0, 0, 0, 1, 0, 0])
-        scores = [5.0, 6.5, 7.0, 8.5, 9.0, 7.5]
+        # Mock the chain construction (the result of the last pipe operation)
+        with patch.object(mock_parser, '__ror__', return_value=final_chain_mock):
+            
+            # Create diff longer than 4000 chars
+            long_diff = "x" * 5000
+            review, elapsed = self.selector.generate_review(long_diff, 'test_prompt')
+            
+            # Check that invoke was called with truncated diff
+            # The argument passed to invoke is a dictionary: {"diff": truncated_diff}
+            final_chain_mock.invoke.assert_called_once()
+            call_args = final_chain_mock.invoke.call_args[0][0] # This will be the dictionary
+            
+            self.assertIn('diff', call_args)
+            self.assertEqual(len(call_args['diff']), 4000)
+
+    @patch('iterative_prompt_selector.llm')
+    @patch('iterative_prompt_selector.parser')
+    def test_generate_review_measures_time(self, mock_parser, mock_llm): # ADD MOCKS HERE
+        """Test that elapsed time is measured correctly"""
         
-        for i, score in enumerate(scores):
-            selector.update_model(
-                features_vector,
-                selector.prompt_names[i % len(selector.prompt_names)],
-                score
-            )
+        # Mock the *final* chain object
+        final_chain_mock = MagicMock()
         
-        assert selector.score_history == scores
+        def slow_invoke(x):
+            import time
+            time.sleep(0.1)
+            return "Review" # Ensure the mock returns a non-Generation type to skip real parser logic
+        
+        final_chain_mock.invoke.side_effect = slow_invoke # Assign the slow_invoke to the final chain's invoke
+        
+        # Mock the chain construction (the result of the last pipe operation)
+        with patch.object(mock_parser, '__ror__', return_value=final_chain_mock):
+            
+            self.selector.prompts = {'test_prompt': Mock()}
+            # The prompt mock is no longer needed since we mock the full chain construction via `parser.__ror__`
+            
+            review, elapsed = self.selector.generate_review("diff", 'test_prompt')
+            
+            self.assertEqual(review, "Review")
+            self.assertGreaterEqual(elapsed, 0.1)

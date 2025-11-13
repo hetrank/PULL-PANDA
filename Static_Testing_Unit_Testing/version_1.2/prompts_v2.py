@@ -6,8 +6,7 @@ including zero-shot, few-shot, chain-of-thought, and advanced techniques.
 """
 
 from collections import OrderedDict
-from langchain.prompts import ChatPromptTemplate
-
+from langchain_core.prompts import ChatPromptTemplate  # ✅ NEW, CORRECT PATH
 
 def get_prompts():
     """
