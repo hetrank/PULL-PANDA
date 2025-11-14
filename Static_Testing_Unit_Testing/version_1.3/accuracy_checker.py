@@ -17,9 +17,8 @@ from datetime import datetime
 from reviewer import fetch_pr_diff, llm, parser, save_text_to_file
 from config import OWNER, REPO, PR_NUMBER, GITHUB_TOKEN
 from prompts_v2 import get_prompts
-from langchain.prompts import ChatPromptTemplate
-from langchain.schema.output_parser import StrOutputParser
-
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 # -------------------------
 # Heuristic helpers
 # -------------------------

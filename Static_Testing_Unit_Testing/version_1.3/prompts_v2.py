@@ -2,7 +2,7 @@
 #
 # Contains all prompt templates in a dictionary for easy access
 
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 
 def get_prompts():
     """Return all available prompts in a dictionary"""
