@@ -7,10 +7,13 @@
     "dev:server": "tsx server/index.ts",
     "dev:client": "vite",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
-    "build": "vite build",
-    "preview": "vite preview",
-    "check": "tsc",
-    "db:push": "drizzle-kit push",
+
+    "build": "npm run build:client && npm run build:server",
+
+    "build:client": "vite build",
+
+    "build:server": "esbuild server/index.ts --bundle --platform=node --target=node18 --outfile=dist/server/index.js",
+
     "start": "node dist/server/index.js"
   },
   "dependencies": {
