@@ -50,7 +50,7 @@ jobs:
           PINECONE_INDEX_NAME: ai
         run: |
           echo "Running ingest..."
-          python "Version/RAG_Version 1.3/ingest.py"
+          python "Version/RAG_Version 1.3/corrected_ingest_V_1.3.py"
 
           echo "Running PR reviewer..."
           python "Version/RAG_Version 1.3/iterative_prompt_selector.py"
