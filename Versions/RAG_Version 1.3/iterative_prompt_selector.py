@@ -275,7 +275,6 @@ class IterativePromptSelector:
         if post_to_github:
             github_body = (
                 f"🤖 **AI Review**\n\n"
-                f"Prompt: `{selected_prompt}` | Score: **{score}/10**\n\n"
                 f"---\n{review_text}"
             )
             post_review_comment(owner, repo, pr_number, token, github_body)
@@ -311,3 +310,4 @@ def run_iterative_selector(pr_numbers, load_previous=True, save_frequency=2, pos
         print("PR_NUMBER invalid in .env")
     else:
         run_iterative_selector([PR_NUMBER]
+
