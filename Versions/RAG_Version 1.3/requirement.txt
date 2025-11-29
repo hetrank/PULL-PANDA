@@ -12,3 +12,4 @@ sentence-transformers
 pinecone-client
 langchain-pinecone
 GitPython
+semgrep
