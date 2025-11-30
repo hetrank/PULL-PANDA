@@ -55,7 +55,7 @@ jobs:
           echo "Running PR reviewer..."
           python "Versions/RAG_Version 1.3/iterative_prompt_selector.py"
 
-      # 7) Cleanup
+      # 6) Cleanup
       - name: Clean up cloned repo
         run: |
           echo "Cleaning repo_clone..."
