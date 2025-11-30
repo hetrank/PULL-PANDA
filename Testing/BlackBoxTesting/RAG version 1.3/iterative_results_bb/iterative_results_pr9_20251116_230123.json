@@ -1,0 +1,51 @@
+{
+  "timestamp": "20251116_230123",
+  "pr_number": 9,
+  "selected_prompt": "Meta",
+  "review_score": 8.68,
+  "features": {
+    "num_lines": 38,
+    "num_files": 1,
+    "additions": 10,
+    "deletions": 17,
+    "net_changes": -7,
+    "has_comments": 1,
+    "has_functions": 1,
+    "has_imports": 0,
+    "has_test": 1,
+    "has_docs": 0,
+    "has_config": 0,
+    "is_python": 0,
+    "is_js": 0,
+    "is_java": 0
+  },
+  "heuristics": {
+    "length_chars": 2193,
+    "length_words": 341,
+    "bullet_points": 6,
+    "mentions_bug": true,
+    "mentions_suggest": false,
+    "sections_presence": {
+      "summary": true,
+      "bugs": true,
+      "errors": false,
+      "code quality": true,
+      "suggestions": false,
+      "improvements": true,
+      "tests": true,
+      "positive": true,
+      "final review": false
+    }
+  },
+  "meta_evaluation": {
+    "clarity": 9,
+    "usefulness": 10,
+    "depth": 10,
+    "actionability": 9,
+    "positivity": 6,
+    "explain": "The review is thorough and well-structured, providing clear and actionable feedback on both critical bugs and code quality issues, but could be more positive in tone."
+  },
+  "training_samples": 34,
+  "static_output": "=== \ud83d\udd0d Targeted Static Analysis for PYTHON (1 files changed) ===\n\n| \ud83e\udde9 Pylint:\n```\n************* Module config_loader\nconfig_loader.py:1:0: C0114: Missing module docstring (missing-module-docstring)\nconfig_loader.py:5:0: C0116: Missing function or method docstring (missing-function-docstring)\nconfig_loader.py:7:13: W1514: Using open without explicitly specifying an encoding (unspecified-encoding)\nconfig_loader.py:14:0: C0116: Missing function or method docstring (missing-function-docstring)\n\n------------------------------------------------------------------\nYour code has been rated at 6.67/10 (previous run: 6.67/10, +0.00)\n```\n\n| \ud83c\udfaf Flake8:\n```\nconfig_loader.py:5:1: E302 expected 2 blank lines, found 1\nconfig_loader.py:11:80: E501 line too long (80 > 79 characters)\nconfig_loader.py:14:1: E302 expected 2 blank lines, found 1\n```\n\n| \ud83d\udd12 Bandit:\n```\nRun started:2025-11-16 17:31:13.798137\n\nTest results:\n\tNo issues identified.\n\nCode scanned:\n\tTotal lines of code: 12\n\tTotal lines skipped (#nosec): 0\n\tTotal potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0\n\nRun metrics:\n\tTotal issues (by severity):\n\t\tUndefined: 0\n\t\tLow: 0\n\t\tMedium: 0\n\t\tHigh: 0\n\tTotal issues (by confidence):\n\t\tUndefined: 0\n\t\tLow: 0\n\t\tMedium: 0\n\t\tHigh: 0\nFiles skipped (0):\n```\n\n| \ud83e\udde0 Mypy:\n```\nSuccess: no issues found in 1 source file\n```",
+  "retrieved_context": "# Our Engineering Coding Standards\n\n## Python\n- All functions must have type hints.\n- Use `black` for formatting.\n- All public functions must have a docstring explaining args, returns, and raises.\n- Avoid global variables. Pass state explicitly.\n\n## General\n- PRs should be small and focused.\n- Always include unit tests for new logic.\n- Do not commit secrets. Use .env files.\n---\n# Our Engineering Coding Standards\n\n## Python\n- All functions must have type hints.\n- Use `black` for formatting.\n- All public functions must have a docstring explaining args, returns, and raises.\n- Avoid global variables. Pass state explicitly.\n\n## General\n- PRs should be small and focused.\n- Always include unit tests for new logic.\n- Do not commit secrets. Use .env files."
+}

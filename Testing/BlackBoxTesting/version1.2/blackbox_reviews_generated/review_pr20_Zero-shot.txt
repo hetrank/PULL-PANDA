@@ -1,0 +1,76 @@
+**Code Review**
+
+The provided GitHub Pull Request diff introduces a new Python file `synthetic_pr_20.py` with a single function `divide(a, b)`. Here's a review of the code:
+
+### Bugs and Mistakes
+
+1. **Broad Exception Handling**: The `except` block catches all exceptions using `Exception as e`. This can mask other unexpected errors, making it harder to debug. It's better to catch specific exceptions that can occur during division, such as `ZeroDivisionError`.
+2. **Inaccurate Error Message**: The error message "Division failed: " + str(e) does not provide enough context about the error. It would be more informative to include the values of `a` and `b` that caused the error.
+3. **Lack of Input Validation**: The function does not validate its inputs. It assumes that `a` and `b` are numbers, but it does not check for this. If non-numeric inputs are passed, the function will fail with a `TypeError`.
+
+### Suggestions
+
+1. **Catch Specific Exceptions**: Instead of catching all exceptions, catch `ZeroDivisionError` specifically:
+   ```python
+except ZeroDivisionError as e:
+    raise ValueError(f"Cannot divide by zero: {a} / {b}")
+```
+2. **Improve Error Messages**: Include the values of `a` and `b` in the error message to provide more context:
+   ```python
+except Exception as e:
+    raise ValueError(f"Error dividing {a} by {b}: {str(e)}")
+```
+3. **Add Input Validation**: Check if `a` and `b` are numbers before attempting division:
+   ```python
+if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
+    raise TypeError("Both inputs must be numbers")
+```
+4. **Consider Adding a Docstring**: Add a docstring to the `divide` function to describe its purpose, parameters, and return values:
+   ```python
+def divide(a, b):
+    """
+    Divide two numbers.
+
+    Args:
+        a (int or float): The dividend.
+        b (int or float): The divisor.
+
+    Returns:
+        int or float: The result of the division.
+
+    Raises:
+        ValueError: If division by zero occurs.
+        TypeError: If either input is not a number.
+    """
+```
+5. **Test the Function**: Write unit tests to ensure the function behaves correctly for different inputs and edge cases.
+
+### Refactored Code
+
+Here's the refactored code incorporating the suggestions:
+```python
+def divide(a, b):
+    """
+    Divide two numbers.
+
+    Args:
+        a (int or float): The dividend.
+        b (int or float): The divisor.
+
+    Returns:
+        int or float: The result of the division.
+
+    Raises:
+        ValueError: If division by zero occurs.
+        TypeError: If either input is not a number.
+    """
+    if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
+        raise TypeError("Both inputs must be numbers")
+
+    try:
+        return a / b
+    except ZeroDivisionError as e:
+        raise ValueError(f"Cannot divide by zero: {a} / {b}")
+    except Exception as e:
+        raise ValueError(f"Error dividing {a} by {b}: {str(e)}")
+```
