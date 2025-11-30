@@ -1,0 +1,73 @@
+**Code Review**
+
+The provided GitHub Pull Request diff introduces a new Python function `parse_user` in the file `synthetic_pr_12.py`. The function is designed to parse user data from a dictionary and return a new dictionary with the name stripped and age converted to an integer.
+
+### Bugs and Mistakes
+
+1. **KeyError**: The function does not handle cases where the input dictionary is missing the 'name' or 'age' keys. This will raise a KeyError.
+2. **Type Error**: The function assumes that the 'age' value in the dictionary is a string that can be converted to an integer. If the 'age' value is not a string or cannot be converted to an integer, a ValueError will be raised.
+3. **Lack of Input Validation**: The function does not validate the input data type. It assumes that the input is a dictionary, but it does not check for this.
+
+### Suggestions
+
+1. **Add Input Validation**: Validate the input data type to ensure it is a dictionary.
+2. **Handle Missing Keys**: Use the `dict.get()` method to handle cases where the 'name' or 'age' keys are missing from the dictionary.
+3. **Handle Non-Integer Age Values**: Use a try-except block to handle cases where the 'age' value cannot be converted to an integer.
+4. **Add Error Messages**: Provide informative error messages to help with debugging.
+
+### Refactored Code
+
+```python
+def parse_user(data):
+    """
+    Parse user data from a dictionary.
+
+    Args:
+        data (dict): Dictionary containing 'name' and 'age' keys.
+
+    Returns:
+        dict: Dictionary with name stripped and age converted to an integer.
+
+    Raises:
+        TypeError: If input data is not a dictionary.
+        KeyError: If 'name' or 'age' keys are missing from the dictionary.
+        ValueError: If 'age' value cannot be converted to an integer.
+    """
+    if not isinstance(data, dict):
+        raise TypeError("Input data must be a dictionary")
+
+    name = data.get('name')
+    age = data.get('age')
+
+    if name is None or age is None:
+        raise KeyError("Dictionary must contain 'name' and 'age' keys")
+
+    try:
+        age = int(age)
+    except ValueError:
+        raise ValueError("Age value must be a string that can be converted to an integer")
+
+    return {'name': name.strip(), 'age': age}
+```
+
+### Example Use Cases
+
+```python
+# Valid input
+data = {'name': 'John Doe', 'age': '30'}
+print(parse_user(data))  # Output: {'name': 'John Doe', 'age': 30}
+
+# Invalid input: missing 'age' key
+data = {'name': 'John Doe'}
+try:
+    print(parse_user(data))
+except KeyError as e:
+    print(e)  # Output: Dictionary must contain 'name' and 'age' keys
+
+# Invalid input: non-integer 'age' value
+data = {'name': 'John Doe', 'age': 'thirty'}
+try:
+    print(parse_user(data))
+except ValueError as e:
+    print(e)  # Output: Age value must be a string that can be converted to an integer
+```

@@ -1,0 +1,50 @@
+{
+  "timestamp": "20251115_203254",
+  "pr_number": 10,
+  "selected_prompt": "Zero-shot",
+  "review_score": 7.94,
+  "features": {
+    "num_lines": 16,
+    "num_files": 1,
+    "additions": 10,
+    "deletions": 1,
+    "net_changes": 9,
+    "has_comments": 1,
+    "has_functions": 1,
+    "has_imports": 0,
+    "has_test": 1,
+    "has_docs": 0,
+    "has_config": 0,
+    "is_python": 0,
+    "is_js": 0,
+    "is_java": 0
+  },
+  "heuristics": {
+    "length_chars": 2214,
+    "length_words": 319,
+    "bullet_points": 0,
+    "mentions_bug": true,
+    "mentions_suggest": false,
+    "sections_presence": {
+      "summary": false,
+      "bugs": true,
+      "errors": true,
+      "code quality": false,
+      "suggestions": true,
+      "improvements": false,
+      "tests": false,
+      "positive": false,
+      "final review": false
+    }
+  },
+  "meta_evaluation": {
+    "clarity": 9,
+    "usefulness": 10,
+    "depth": 9,
+    "actionability": 10,
+    "positivity": 8,
+    "explain": "The review is thorough and provides actionable suggestions with refactored code, but could be more positive in tone."
+  },
+  "training_data_size": 17,
+  "model_trained": true
+}

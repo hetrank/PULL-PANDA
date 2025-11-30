@@ -78,7 +78,7 @@ cd pull-panda
 #### 2. Install Backend Dependencies
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirement.txt
 ```
 
 #### 3. Configure Environment Variables
@@ -105,7 +105,8 @@ python main.py
 ```bash
 cd dashboard
 npm install
-npm run dev
+npm run dev:server
+npm run dev:client
 ```
 
 The dashboard will be available at `http://localhost:3000`
@@ -175,9 +176,7 @@ PULL-PANDA implements comprehensive testing at multiple levels:
 
 ### Analytics Dashboard
 - Evaluation summaries and trends
-- Static analysis result visualization
-- Generated review inspection
-- Automatic updates after each review
+- Shows the latest AI review to the PR
 
 ---
 
@@ -193,7 +192,7 @@ Added Semgrep scanning and enriched prompts
 Implemented Pinecone indexing and context-aware reviews
 
 ### Sprint 4: Online Learning Model
-Built prompt selection and evaluation system
+Built a prompt selection and evaluation system
 
 ### Final Sprint: Dashboard & Testing
 Full analytics dashboard and comprehensive test suite
@@ -207,7 +206,6 @@ Full analytics dashboard and comprehensive test suite
 - **Local/Offline Processing** — Migration to local LLMs (Ollama) for private reviews
 - **Performance Optimization** — Reduced RAG latency and cached embeddings
 - **Advanced Features**
-  - Inline code change suggestions
   - Automatic PR labeling
   - Repository-level audit reports
   - Background workers for large-scale scanning
@@ -217,12 +215,6 @@ Full analytics dashboard and comprehensive test suite
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
----
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 
