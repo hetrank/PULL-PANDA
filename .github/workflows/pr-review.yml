@@ -3,7 +3,7 @@ name: 🤖 PR Reviewer Bot
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, reopened]
 
 permissions:
   contents: read
