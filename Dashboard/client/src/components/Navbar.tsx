@@ -1,4 +1,3 @@
-// client/src/components/Navbar.tsx
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";

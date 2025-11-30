@@ -1,4 +1,3 @@
-// SWE_project_website/server/routes.ts
 import type { Express, Request, Response } from "express";
 import { Octokit } from "@octokit/rest";
 

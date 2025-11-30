@@ -1,5 +1,3 @@
-// SWE_project_website/client/src/pages/PullRequests.tsx
-
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { PullRequestCard } from "@/components/PullRequestCard";

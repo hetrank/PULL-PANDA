@@ -1,5 +1,3 @@
-appsidebar;
-
 import { SiGithub } from "react-icons/si";
 import {
   BarChart3,

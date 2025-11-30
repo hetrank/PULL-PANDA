@@ -1,5 +1,3 @@
-// SWE_project_website/client/src/pages/Analytics.tsx
-
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";

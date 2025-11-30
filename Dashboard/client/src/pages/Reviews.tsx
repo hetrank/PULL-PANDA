@@ -1,4 +1,3 @@
-// SWE_project_website/client/src/pages/Reviews.tsx
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

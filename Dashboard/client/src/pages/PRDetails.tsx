@@ -1,5 +1,3 @@
-// SWE_project_website/client/src/pages/PRDetails.tsx
-
 import ReactMarkdown from "react-markdown";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
