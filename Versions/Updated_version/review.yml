@@ -1,0 +1,50 @@
+# Note: GitHub Actions only triggers on YAML files in .github/workflows/
+# pr-view.py is just a script, it must be called from a workflow .yml file (not placed here directly)
+
+name: AI PR Reviewer Bot
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install groq
+
+      - name: Fetch PR diff
+        run: gh pr diff ${{ github.event.pull_request.number }} > diff.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run AI reviewer
+        run: python review_bot.py
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          DIFF_FILE: diff.txt
+          OUTPUT_DIR: reviews
+
+      - name: Post each AI review as PR comment
+        run: |
+          for file in reviews/*.md; do
+            echo "📤 Posting $file..."
+            gh pr comment ${{ github.event.pull_request.number }} --body-file "$file"
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
